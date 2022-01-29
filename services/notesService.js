@@ -1,15 +1,17 @@
 const notesInterface = require("./notesInterface")
 
-//req.app.locals.variable.storage
-//?? 
-let storage = {}
-const notesService = ({}.prototype = notesInterface)
+const notesServiceInit = (storage) => {
 
-  notesService.getAll = (_, _) => storage.notes
+  const notesService = ({...notesInterface})
 
-  notesService.getVisible = (_ , {flag}) => storage.notes.filter(note => note.archived === (flag === 'active' ? true: false))
+  notesService.getAll = () => storage.notes
 
-  notesService.getOne = (id, _) => storage.notes.filter(note => note.id === id)
+  notesService.getVisible = (flag, _) => storage.notes.filter(note => note.archived === (flag === 'active' ? false: true))
+
+  notesService.getOne = (id,_) => {
+    console.log(`getOne`, id)//, storage)
+    return storage.notes.filter(note => note.id == id)
+  }
 
   notesService.getSummary = () => {
     const usedNotesCategories = [];
@@ -22,19 +24,24 @@ const notesService = ({}.prototype = notesInterface)
           "active": storage.notes.filter(note => (note.category == cat && !note.archived)).length,
           "archived": storage.notes.filter(note => (note.category == cat && note.archived)).length,
         }))
+        console.log(`stat`, notesMapArray)
     return notesMapArray;   
   }
 
-  notesService.editNote = (editedNote, _) => {
-    storage.notes.forEach((note, idx) => (note.id === editedNote.id ? (storage.notes[idx] = editedNote) : '')) 
+  notesService.editNote = (editedNote,_) => {
+    storage.notes.forEach((note, idx) => (note.id === editedNote.id ? (storage.notes[idx] = editedNote) : ''))
+    return [] 
   }
 
-  notesService.addNew = (newNote, _) => storage.notes.push(newNote)
+  notesService.addNew = (newNote,_) => {storage.notes.push(newNote); return []}
 
-  notesService.removeAll = () => storage.notes = []
+  notesService.removeAll = () => {storage.notes = [];return []}
 
-  notesService.removeVisible = (flag) => storage.notes = storage.notes.filter(note => note.archived !== (flag === 'active' ? true: false))
+  notesService.removeVisible = (flag) => {storage.notes = storage.notes.filter(note => note.archived !== (flag === 'active' ? false: true)); return []}
 
-  notesService.removeOne = (id) => storage.notes = storage.notes.filter(note => note.id !== id)
+  notesService.removeOne = (id) => {storage.notes = storage.notes.filter(note => note.id !== id); return []}
 
-module.exports = notesService
+  return notesService;
+}
+
+module.exports = notesServiceInit

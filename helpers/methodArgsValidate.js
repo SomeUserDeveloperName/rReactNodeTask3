@@ -1,21 +1,28 @@
 const yup = require("yup");
-const schemas = require("");
+const schemas = require("../repositories/schemas");
 
 const methodToArgsMap = { 
-	getAll: () => true,
-	getVisible: (arg) => schemas.noteGetVisibleSchema.isValid(arg),
-	getOne: (arg) => schemas.noteIdSchema.isValid(arg),
-	getSummary: () => true,
-	addNew: (arg) => schemas.noteSchema.isValid(arg),
-	removeVisible: () => true,
-	removeAll: () => true,
-	removeOne:(arg) => schemas.noteIdSchema.isValid(arg),
-	editNote: (arg) => schemas.noteSchema.isValid(arg),
+	getAll: () => [true],
+	getVisible: (arg) => [true, arg.params.flag], //schemas.noteGetVisibleSchema.isValid(arg)],
+	getOne: (arg) => { 
+		console.log(`getOne validate`, arg.params.id)
+		return [true, arg.params.id] //schemas.noteIdSchema.isValid(arg.params.id), arg.params.id]
+	},
+	getSummary: () => {console.log(`summary validate`); return [true]},
+	addNew: (arg) => [schemas.noteSchema.isValid(arg)],
+	removeVisible: (arg) => [true, arg.params.flag],
+	removeAll: () => [true],
+	removeOne:(arg) => [true, arg.params.id],//schemas.noteIdSchema.isValid(arg)],
+	editNote: (arg) => [schemas.noteSchema.isValid(arg)],
 }
 
 const methodArgsValidate = (method, arg) => { 
-	methodToArgsMap[method](arg) ? resolve(true) 
-								 : reject ({error: `invalid args ${args} for method: ${method}`, type: "internal"})	
+	// console.log(`deb`, methodToArgsMap, method)//, arg)
+	const [status, methodArgs] = methodToArgsMap[method](arg)
+	console.log(`method validate`, status, methodArgs)
+	return status
+		   ? methodArgs
+		   : ({error: `invalid args ${args} for method: ${method}`, type: "internal"})	
 }
 
 module.exports = methodArgsValidate

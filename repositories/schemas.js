@@ -1,10 +1,27 @@
+const yup = require("yup");
+const notesCategories = require("./notesCategories");
+
+const noteIdSchema = yup.object({
+  body: yup.object({
+          id: yup.number().required(),
+  }),
+});
+
+const noteGetVisibleSchema = yup.object({
+    flag: yup.mixed().oneOf(['active', 'archived']),
+})
+
+const noteCategory = yup.object({
+     category: yup.mixed().oneOf(notesCategories),
+})
+
 const noteSchema = yup.object({
     body: yup.object({
-            id: yup.number().required(),
+            id: noteIdSchema,
             name: yup.string().min(3).max(32).required(),
             dateCreated: yup.string().matches(),
             dateEdited: yup.string(),
-            category: yup.string().min(2).max(20).required(),
+            category: noteCategory,
             content: yup.string().min(2).max(50).required(),
             archived: yup.bool().required(),
   }),
@@ -13,10 +30,11 @@ const noteSchema = yup.object({
 //   }),
 });
 
-const noteIdSchema = yup.object({
-    body: yup.object({
-            id: yup.number().required(),
-  }),
-});
+const schemas = {
+    noteSchema,
+    noteIdSchema,
+    noteGetVisibleSchema,
+    noteCategory,
+}
 
 module.exports = schemas;

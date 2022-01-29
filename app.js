@@ -9,7 +9,6 @@ var notesRouter = require('./routes/notesRouter');
 
 var app = express();
 
-app.locals.persistStorage = storage
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -17,6 +16,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/notes', notesRouter);
+app.use('/notes', notesRouter({storage}));
 
 module.exports = app;

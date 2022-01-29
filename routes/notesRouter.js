@@ -1,60 +1,64 @@
-var express = require('express');
-var router = express.Router();
-const notesIface = require('../services/notesInterface')
+const noteRouterInit = (dependencies) => { 
 
-/* GET all notes. */
-router.get('/', function(req, res, next) {
+    var express = require('express');
+    var router = express.Router();
+    const pipeline = require('../services/pipeline')(dependencies);
+    const notesIface = require('../services/notesInterface');
+
+    /* GET all notes. */
+    router.get('/', async function(req, res, next) {
   
-    //res.send('respond with a resource');
-  res.send(pipeline(req, notesIface.getAll, res))
-});
+      res.send(await pipeline(req, notesIface.getAll, res))
+    });
 
-/* GET only visible notes by Flag [active|archive] */
-router.get('/visible/:flag', function(req, res, next) {
+    /* GET only visible notes by Flag [active|archive] */
+    router.get('/visible/:flag', async function(req, res, next) {
 
-   res.send(pipeline(req, notesIface.getVisible, res))
-});
+      res.send(await pipeline(req, notesIface.getVisible, res))
+    });
 
-/* GET selected note. */
-router.get('/:id', function(req, res, next) {
-
-   res.send(pipeline(req, notesIface.getOne, res))
-});
-
-/* GET notes computed stat. */
-router.get('/stats', function(req, res, next) {
-  
-  res.send(pipeline(req, notesIface.getSummary, res))
-});
-
-/* ADD new note to the store. */
-router.post('/', function(req, res, next) {
+    /* GET notes computed stat. */
+    router.get('/stats', async function(req, res, next) {
     
-  res.send(pipeline(req, notesIface.addNew, res))
-});
+      res.send(await pipeline(req, notesIface.getSummary, res))
+    });
 
-/* EDIT  selected note in store. */
-router.patch('/:id', function(req, res, next) {
+    /* GET selected note. */
+    router.get('/:id', async function(req, res, next) {
 
-  res.send(pipeline(req, notesIface.editNote, res))
-});
+      res.send(await pipeline(req, notesIface.getOne, res))
+    });
 
-/* REMOVE all showed notes from store. */
-router.delete('/visible', function(req, res, next) {
-  
-  res.send(pipeline(req, notesIface.removeVisible, res))
-});
+    /* ADD new note to the store. */
+    router.post('/', async function(req, res, next) {
+        
+      res.send(await pipeline(req, notesIface.addNew, res))
+    });
 
-/* REMOVE all notes from store. */
-router.delete('/all', function(req, res, next) {
+    /* EDIT  selected note in store. */
+    router.patch('/:id', async function(req, res, next) {
 
-  res.send(pipeline(req, notesIface.removeAll, res))
-});
+      res.send(await pipeline(req, notesIface.editNote, res))
+    });
 
-/* REMOVE selected note from store. */
-router.delete('/:id', function(req, res, next) {
+    /* REMOVE all showed notes from store by Flag [active|archive]. */
+    router.delete('/visible/:flag', async function(req, res, next) {
+      
+      res.send(await pipeline(req, notesIface.removeVisible, res))
+    });
 
-  res.send(pipeline(req, notesIface.removeOne, res))
-});
+    /* REMOVE all notes from store. */
+    router.delete('/all', async function(req, res, next) {
 
-module.exports = router;
+      res.send(await pipeline(req, notesIface.removeAll, res))
+    });
+
+    /* REMOVE selected note from store. */
+    router.delete('/:id', async function(req, res, next) {
+
+      res.send(await pipeline(req, notesIface.removeOne, res))
+    });
+
+    return router
+}
+module.exports = noteRouterInit;

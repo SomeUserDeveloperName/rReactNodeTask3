@@ -1,3 +1,4 @@
+const notesCategories = require("./notesCategories")
 const store = {
     "notes": 
             [{ "id": "1", 
@@ -56,7 +57,7 @@ const store = {
                 "dateEdited": "11/12/2035", 
                 "archived": false,
                 }],        
-    "notesCategories": ['Task', 'Random Thought', 'Idea', 'Quote']
+   notesCategories,
 } 
 
 module.exports = store;
